@@ -1,4 +1,3 @@
-import { Button } from "@/components/Button";
 import { GradientBackground } from "@/components/GradientBackground";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { COLORS, FONT_SIZE, SPACING } from "@/constants/theme";
@@ -7,13 +6,7 @@ import { useThemeStore } from "@/store/themeStore";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 interface IModules {
   name: string;
@@ -101,53 +94,7 @@ export default function HomeScreen() {
             </Text>
           </View>
 
-          <View style={styles.modulesContainer}>
-            {dataModules.map((module, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[styles.moduleCard, { backgroundColor: theme.surface }]}
-                disabled={module.comingSoon}
-                activeOpacity={0.7}
-              >
-                <View style={styles.moduleIconContainer}>{module.icon}</View>
-                <Text
-                  style={[styles.moduleName, { color: theme.text.primary }]}
-                >
-                  {module.name}
-                </Text>
-                <Text
-                  style={[styles.moduleDesc, { color: theme.text.secondary }]}
-                >
-                  {module.description}
-                </Text>
-                {module.comingSoon && (
-                  <View
-                    style={[
-                      styles.comingSoonBadge,
-                      { backgroundColor: theme.primary },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.comingSoonText,
-                        { color: theme.text.inverse },
-                      ]}
-                    >
-                      Próximamente
-                    </Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          <Button
-            title="Cerrar Sesión"
-            onPress={handleLogout}
-            variant="outline"
-            style={styles.logoutButton}
-            textStyle={{ color: theme.error }}
-          />
+          <Text>dashboard</Text>
         </ScrollView>
       </View>
     </GradientBackground>

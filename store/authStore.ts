@@ -18,6 +18,7 @@ interface AuthState {
   register: (name: string, email: string, username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  initializeTestUsers: () => Promise<void>; // Nueva función para inicializar usuarios de prueba
 }
 
 const AUTH_KEY = 'auth_store';
@@ -29,11 +30,47 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isLoading: true,
   error: null,
 
+  // Función para inicializar usuarios de prueba
+  initializeTestUsers: async () => {
+    try {
+      const storedUsers = await SecureStore.getItemAsync(USER_KEY);
+      
+      // Si ya hay usuarios almacenados, no hacemos nada
+      if (storedUsers) return;
+      
+      // Crear usuarios de prueba
+      const testUsers = [
+        {
+          id: '1',
+          name: 'Administrador',
+          email: 'admin@test.com',
+          username: 'admin',
+          password: 'admin123',
+          role: 'admin'
+        },
+        {
+          id: '2',
+          name: 'Propietario',
+          email: 'owner@test.com',
+          username: 'owner',
+          password: 'owner123',
+          role: 'owner'
+        }
+      ];
+      
+      // Guardar usuarios de prueba
+      await SecureStore.setItemAsync(USER_KEY, JSON.stringify(testUsers));
+    } catch (error) {
+      console.error('Error initializing test users:', error);
+    }
+  },
+
   login: async (username: string, password: string) => {
     set({ isLoading: true, error: null });
     try {
-      // In a real app, this would be an API call, but since this is local-only,
-      // we'll check against stored user data
+      // Inicializar usuarios de prueba si no existen
+      await get().initializeTestUsers();
+      
       const storedUsers = await SecureStore.getItemAsync(USER_KEY);
       const users = storedUsers ? JSON.parse(storedUsers) : [];
       
@@ -76,6 +113,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   register: async (name: string, email: string, username: string, password: string) => {
     set({ isLoading: true, error: null });
     try {
+      // Inicializar usuarios de prueba si no existen
+      await get().initializeTestUsers();
+      
       // In a real app, this would be an API call
       // For now, we'll store user data locally
       const storedUsers = await SecureStore.getItemAsync(USER_KEY);
@@ -97,7 +137,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         email,
         username,
         password,
-        role: "owner",
+        role: "user", // Cambiado a "user" como valor por defecto en lugar de "owner"
       };
       
       // Add user to our "database"
@@ -153,6 +193,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   checkAuth: async () => {
     set({ isLoading: true });
     try {
+      // Inicializar usuarios de prueba si no existen
+      await get().initializeTestUsers();
+      
       // Check if user is authenticated
       const authData = await SecureStore.getItemAsync(AUTH_KEY);
       

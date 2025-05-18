@@ -116,8 +116,8 @@ export default function LoginScreen() {
               <Text style={{ color: theme.text.secondary }}>
                 ¿No tienes una cuenta?{" "}
               </Text>
-              {/* <Link href="/auth/register" asChild> */}
-              <TouchableOpacity onPress={() => router.navigate("/auth/register")}>
+              {/* <Link href="/(auth)/register" asChild> */}
+              <TouchableOpacity onPress={() => router.navigate("/(auth)/register")}>
                 <Text style={{ color: theme.primary, fontWeight: "500" }}>
                   Regístrate
                 </Text>

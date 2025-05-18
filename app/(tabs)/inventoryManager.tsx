@@ -10,7 +10,7 @@ export default function InventoryManagerPage() {
   }
 
   if (!isAuthenticated) {
-    return <Redirect href="/" />;
+    return <Redirect href="/(auth)/login" />;
   }
 
   return <InventoryScreen />;

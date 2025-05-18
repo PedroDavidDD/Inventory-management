@@ -17,7 +17,7 @@ export default function NotFoundScreen() {
         <ThemedText type="subtitle" style={styles.subtitle}>
           Parece que no podemos encontrar la página que estás buscando.
         </ThemedText>
-        <Link href="/" style={styles.link} asChild>
+        <Link href="/(auth)/login" style={styles.link} asChild>
           <Pressable>
             <ThemedView style={styles.button}>
               <ThemedText type="defaultSemiBold" style={styles.buttonText}>

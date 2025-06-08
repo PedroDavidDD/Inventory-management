@@ -3,11 +3,7 @@ import { useAuthStore } from "@/store/authStore";
 import { Redirect } from "expo-router";
 
 export default function DashboardPage() {
-  const { isAuthenticated, isLoading } = useAuthStore();
-
-  if (isLoading) {
-    return null;
-  }
+  const { isAuthenticated } = useAuthStore();
 
   if (!isAuthenticated) {
     return <Redirect href="/(auth)/login" />;

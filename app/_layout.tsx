@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useAuthStore } from "@/store/authStore";
 import {
   DarkTheme,
   DefaultTheme,
@@ -10,14 +11,25 @@ import "react-native-reanimated";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const { isAuthenticated } = useAuthStore();
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)/register" options={{ headerShown: false }} />
-
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack
+        screenOptions={{
+          headerShown: false, 
+        }}
+      >
+         {isAuthenticated ? (
+        <>
+          <Stack.Screen name="(drawer)/_layout" />
+        </>
+      ) : (
+        <>
+          <Stack.Screen name="(auth)/login" />
+          <Stack.Screen name="(auth)/register" />
+        </>
+      )}
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />

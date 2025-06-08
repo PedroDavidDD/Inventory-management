@@ -22,7 +22,7 @@ export default function RootLayout() {
       >
          {isAuthenticated ? (
         <>
-          <Stack.Screen name="(drawer)/_layout" />
+          <Stack.Screen name="(drawer)" />
         </>
       ) : (
         <>

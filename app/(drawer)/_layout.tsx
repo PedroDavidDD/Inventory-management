@@ -6,7 +6,14 @@ export default function DrawerLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Drawer>
         <Drawer.Screen
-          name="(tabs)/index"
+          name="/(tabs)"
+          options={{
+            drawerContentStyle: {
+              display: "none",
+          }}}
+        />
+        <Drawer.Screen
+          name="/(tabs)/index"
           options={{
             drawerLabel: "Dashboard",
             title: "Dashboard",
@@ -14,7 +21,7 @@ export default function DrawerLayout() {
         />
 
         <Drawer.Screen
-          name="(tabs)/inventoryManager"
+          name="/(drawer)/(tabs)/inventoryManager"
           options={{
             drawerLabel: "Inventario",
             title: "Gestor de Inventario",
@@ -22,7 +29,7 @@ export default function DrawerLayout() {
         />
 
         <Drawer.Screen
-          name="(tabs)/formProducts"
+          name="/(drawer)/(tabs)/formProducts"
           options={{
             drawerLabel: "Agregar Productos",
             title: "Agregar",

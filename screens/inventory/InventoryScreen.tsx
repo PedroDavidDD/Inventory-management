@@ -16,7 +16,6 @@ export default function InventoryScreen() {
               day: "numeric",
             })}
           </Text>
-          <Text>InventoryScreen</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

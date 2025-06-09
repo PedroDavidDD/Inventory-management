@@ -1,68 +1,38 @@
-// app/(drawer)/(tabs)/inventoryManager.tsx
+import { FilterButton } from '@/components/inventory/FilterButton';
+import { ProductItem } from '@/components/inventory/ProductItem';
+import { COLORS } from '@/constants/theme';
 import { useAuthStore } from '@/store/authStore';
 import { useProductStore } from '@/store/productStore';
-import { Product, ProductStatus } from '@/types';
-import { Ionicons } from '@expo/vector-icons';
+import { ProductStatus } from '@/types';
 import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
 
-const InventoryManager = () => {
+const statusFilters: (ProductStatus | 'all')[] = ['all', 'activo', 'próximo a vencer', 'vencido'];
+
+export const InventoryManager = () => {
   const { user } = useAuthStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<ProductStatus | 'all'>('all');
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   
-  // Obtenemos todos los productos del store
   const products = useProductStore(state => state.products);
   const deleteProduct = useProductStore(state => state.deleteProduct);
 
-  // Efecto para filtrar productos cuando cambian los filtros o los productos
-  useEffect(() => {
-    if (!user) return;
-
-    // Filtramos primero por usuario
-    const userProducts = products.filter(p => p.userId === user.id);
+  const filteredProducts = useMemo(() => {
+    if (!user) return [];
     
-    // Luego aplicamos los otros filtros
-    const filtered = userProducts.filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = selectedStatus === 'all' || product.status === selectedStatus;
-      return matchesSearch && matchesStatus;
-    });
-
-    setFilteredProducts(filtered);
+    return products
+      .filter(p => p.userId === user.id)
+      .filter(product => {
+        const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesStatus = selectedStatus === 'all' || product.status === selectedStatus;
+        return matchesSearch && matchesStatus;
+      });
   }, [products, user, searchQuery, selectedStatus]);
 
   const handleEdit = (id: string) => {
     router.push(`/(drawer)/(tabs)/formProducts?editId=${id}`);
   };
-
-  const handleDelete = (id: string) => {
-    deleteProduct(id);
-  };
-
-  const renderItem = ({ item }: { item: Product }) => (
-    <View style={styles.itemContainer}>
-      <View style={styles.itemHeader}>
-        <Text style={styles.itemName}>{item.name}</Text>
-        <View style={styles.itemActions}>
-          <TouchableOpacity onPress={() => handleEdit(item.id)}>
-            <Ionicons name="pencil" size={20} color="#4a90e2" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDelete(item.id)}>
-            <Ionicons name="trash" size={20} color="#e74c3c" />
-          </TouchableOpacity>
-        </View>
-      </View>
-      
-      <View style={styles.itemDetails}>
-        <Text>Cantidad: {item.quantity}</Text>
-        <Text>Vence: {new Date(item.expirationDate).toLocaleDateString('es-ES')}</Text>
-        <Text>Estado: {item.status}</Text>
-      </View>
-    </View>
-  );
 
   return (
     <View style={styles.container}>
@@ -74,25 +44,29 @@ const InventoryManager = () => {
       />
       
       <View style={styles.filterRow}>
-        {(['all', 'activo', 'próximo a vencer', 'vencido'] as const).map(status => (
-          <TouchableOpacity 
+        {statusFilters.map(status => (
+          <FilterButton
             key={status}
-            style={[
-              styles.filterButton, 
-              selectedStatus === status && styles.activeFilter
-            ]}
+            label={status === 'all' ? 'Todos' : status}
+            isActive={selectedStatus === status}
             onPress={() => setSelectedStatus(status)}
-          >
-            <Text style={styles.filterText}>
-              {status === 'all' ? 'Todos' : status}
-            </Text>
-          </TouchableOpacity>
+            activeBgColor={COLORS.light.primary}
+            inactiveBgColor="#e2e8f0"
+            activeTextColor={COLORS.light.text.inverse}
+            inactiveTextColor={COLORS.light.primary}
+          />
         ))}
       </View>
       
       <FlatList
         data={filteredProducts}
-        renderItem={renderItem}
+        renderItem={({ item }) => (
+          <ProductItem 
+            product={item} 
+            onEdit={handleEdit}
+            onDelete={deleteProduct}
+          />
+        )}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
@@ -120,52 +94,12 @@ const styles = StyleSheet.create({
   },
   filterRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     marginBottom: 16,
-  },
-  filterButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    backgroundColor: '#e2e8f0',
-  },
-  activeFilter: {
-    backgroundColor: '#cbd5e1',
-  },
-  filterText: {
-    fontSize: 14,
+    gap: 8,
   },
   listContent: {
     paddingBottom: 32,
-  },
-  itemContainer: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  itemHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  itemName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    flex: 1,
-    color: '#1e293b',
-  },
-  itemActions: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  itemDetails: {
-    gap: 4,
   },
   emptyText: {
     textAlign: 'center',

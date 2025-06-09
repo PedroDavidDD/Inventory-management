@@ -5,15 +5,23 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 const FormProducts = () => {
   const { editId } = useLocalSearchParams<{ editId?: string }>();
   const { user } = useAuthStore();
   const isEditing = !!editId;
-  
+
   const { addProduct, updateProduct, getProductById } = useProductStore();
-  
+
+  // Estado inicial del formulario
   const [formData, setFormData] = useState<Omit<Product, 'id' | 'createdAt' | 'status'>>({
     userId: user?.id || '',
     name: '',
@@ -29,15 +37,38 @@ const FormProducts = () => {
 
   const [showDatePicker, setShowDatePicker] = useState<'entry' | 'expiration' | null>(null);
 
-  useEffect(() => {
-    if (isEditing && editId) {
-      const product = getProductById(editId);
-      if (product) {
-        const { id, createdAt, status, ...rest } = product;
-        setFormData(rest);
-      }
+  const resetForm = () => {
+    setFormData({
+      userId: user?.id || '',
+      name: '',
+      entryDate: new Date().toISOString(),
+      expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      quantity: 1,
+      isEnabled: true,
+      useLowStockAlert: false,
+      useExpirationAlert: false,
+      useRecurrentAlert: false,
+      tags: [],
+    });
+  };
+
+  const loadProductForEdit = (editId: string) => {
+    const product = getProductById(editId);
+    if (product) {
+      const { id, createdAt, status, ...rest } = product;
+      setFormData(rest);
     }
-  }, [isEditing, editId]);
+  };
+
+  useEffect(() => {
+    if (!user) return;
+
+    if (isEditing && editId) {
+      loadProductForEdit(editId);
+    } else {
+      resetForm();
+    }
+  }, [isEditing, editId, user]);
 
   const handleSubmit = () => {
     if (!formData.name) {
@@ -57,10 +88,22 @@ const FormProducts = () => {
 
     if (isEditing && editId) {
       updateProduct(editId, productData);
+      Alert.alert("Producto actualizado");
     } else {
       addProduct(productData);
+      Alert.alert("Producto agregado");
     }
-    router.back();
+
+    // Reinicia el estado del formulario
+    resetForm();
+
+    // Navegar y limpiar el parámetro `editId`
+    router.replace('/(drawer)/(tabs)/inventoryManager'); // 👈 Reemplaza con tu ruta correcta
+  };
+
+  const handleCancel = () => {
+    resetForm();
+    router.replace('/(drawer)/(tabs)/inventoryManager');
   };
 
   return (
@@ -69,27 +112,29 @@ const FormProducts = () => {
         style={styles.input}
         placeholder="Nombre del producto*"
         value={formData.name}
-        onChangeText={text => setFormData({...formData, name: text})}
+        onChangeText={(text) => setFormData({ ...formData, name: text })}
       />
-      
+
       <TextInput
         style={styles.input}
         placeholder="Cantidad"
         keyboardType="numeric"
         value={formData.quantity.toString()}
-        onChangeText={text => setFormData({...formData, quantity: Number(text) || 0})}
+        onChangeText={(text) =>
+          setFormData({ ...formData, quantity: Number(text) || 0 })
+        }
       />
-      
+
       <View style={styles.dateRow}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.dateButton}
           onPress={() => setShowDatePicker('entry')}
         >
           <Ionicons name="calendar" size={20} color="#4a90e2" />
           <Text>Ingreso: {new Date(formData.entryDate).toLocaleDateString('es-ES')}</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={styles.dateButton}
           onPress={() => setShowDatePicker('expiration')}
         >
@@ -97,13 +142,21 @@ const FormProducts = () => {
           <Text>Vencimiento: {new Date(formData.expirationDate).toLocaleDateString('es-ES')}</Text>
         </TouchableOpacity>
       </View>
-      
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitText}>
-          {isEditing ? 'Actualizar Producto' : 'Agregar Producto'}
-        </Text>
-      </TouchableOpacity>
-      
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitText}>
+            {isEditing ? 'Actualizar Producto' : 'Agregar Producto'}
+          </Text>
+        </TouchableOpacity>
+
+        {isEditing && (
+          <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+            <Text style={styles.cancelText}>Cancelar</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
       {showDatePicker && (
         <DateTimePicker
           value={new Date(showDatePicker === 'entry' ? formData.entryDate : formData.expirationDate)}
@@ -113,7 +166,7 @@ const FormProducts = () => {
             setShowDatePicker(null);
             if (date) {
               const field = showDatePicker === 'entry' ? 'entryDate' : 'expirationDate';
-              setFormData({...formData, [field]: date.toISOString()});
+              setFormData({ ...formData, [field]: date.toISOString() });
             }
           }}
         />
@@ -121,6 +174,8 @@ const FormProducts = () => {
     </View>
   );
 };
+
+export default FormProducts;
 
 const styles = StyleSheet.create({
   container: {
@@ -154,18 +209,33 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: 'white',
   },
+  buttonContainer: {
+    marginTop: 16,
+    flexDirection: 'row',
+    gap: 12,
+  },
   submitButton: {
+    flex: 1,
     backgroundColor: '#4a90e2',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 16,
   },
   submitText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
   },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: '#d1d5db',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  cancelText: {
+    color: '#1f2937',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 });
-
-export default FormProducts;

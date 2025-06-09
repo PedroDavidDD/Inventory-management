@@ -1,109 +1,177 @@
-import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+// app/(drawer)/(tabs)/inventoryManager.tsx
+import { useAuthStore } from '@/store/authStore';
+import { useProductStore } from '@/store/productStore';
+import { Product, ProductStatus } from '@/types';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-export default function InventoryScreen() {
+const InventoryManager = () => {
+  const { user } = useAuthStore();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState<ProductStatus | 'all'>('all');
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  
+  // Obtenemos todos los productos del store
+  const products = useProductStore(state => state.products);
+  const deleteProduct = useProductStore(state => state.deleteProduct);
+
+  // Efecto para filtrar productos cuando cambian los filtros o los productos
+  useEffect(() => {
+    if (!user) return;
+
+    // Filtramos primero por usuario
+    const userProducts = products.filter(p => p.userId === user.id);
+    
+    // Luego aplicamos los otros filtros
+    const filtered = userProducts.filter(product => {
+      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = selectedStatus === 'all' || product.status === selectedStatus;
+      return matchesSearch && matchesStatus;
+    });
+
+    setFilteredProducts(filtered);
+  }, [products, user, searchQuery, selectedStatus]);
+
+  const handleEdit = (id: string) => {
+    router.push(`/(drawer)/(tabs)/formProducts?editId=${id}`);
+  };
+
+  const handleDelete = (id: string) => {
+    deleteProduct(id);
+  };
+
+  const renderItem = ({ item }: { item: Product }) => (
+    <View style={styles.itemContainer}>
+      <View style={styles.itemHeader}>
+        <Text style={styles.itemName}>{item.name}</Text>
+        <View style={styles.itemActions}>
+          <TouchableOpacity onPress={() => handleEdit(item.id)}>
+            <Ionicons name="pencil" size={20} color="#4a90e2" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleDelete(item.id)}>
+            <Ionicons name="trash" size={20} color="#e74c3c" />
+          </TouchableOpacity>
+        </View>
+      </View>
+      
+      <View style={styles.itemDetails}>
+        <Text>Cantidad: {item.quantity}</Text>
+        <Text>Vence: {new Date(item.expirationDate).toLocaleDateString('es-ES')}</Text>
+        <Text>Estado: {item.status}</Text>
+      </View>
+    </View>
+  );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.greeting}>
-          <Text style={styles.dateText}>
-            {new Date().toLocaleDateString("es-ES", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <View style={styles.container}>
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Buscar productos..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
+      
+      <View style={styles.filterRow}>
+        {(['all', 'activo', 'próximo a vencer', 'vencido'] as const).map(status => (
+          <TouchableOpacity 
+            key={status}
+            style={[
+              styles.filterButton, 
+              selectedStatus === status && styles.activeFilter
+            ]}
+            onPress={() => setSelectedStatus(status)}
+          >
+            <Text style={styles.filterText}>
+              {status === 'all' ? 'Todos' : status}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      
+      <FlatList
+        data={filteredProducts}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>No hay productos que coincidan con los filtros</Text>
+        }
+      />
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8fafc",
-  },
-  scrollContent: {
     padding: 16,
+    backgroundColor: '#f8fafc',
+  },
+  searchInput: {
+    height: 48,
+    borderColor: '#cbd5e1',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    backgroundColor: 'white',
+  },
+  filterRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  filterButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: '#e2e8f0',
+  },
+  activeFilter: {
+    backgroundColor: '#cbd5e1',
+  },
+  filterText: {
+    fontSize: 14,
+  },
+  listContent: {
     paddingBottom: 32,
   },
-  greeting: {
-    marginBottom: 24,
-  },
-  greetingText: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#1e293b",
-  },
-  dateText: {
-    fontSize: 16,
-    color: "#64748b",
-    marginTop: 4,
-  },
-  statsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    gap: 12,
-    marginBottom: 24,
-  },
-  section: {
-    backgroundColor: "white",
-    borderRadius: 12,
+  itemContainer: {
+    backgroundColor: 'white',
+    borderRadius: 8,
     padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
     marginBottom: 12,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#1e293b",
+  itemHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
   },
-  seeAll: {
-    color: "#6366f1",
-    fontWeight: "500",
-  },
-  productItem: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f1f5f9",
-  },
-  productName: {
+  itemName: {
     fontSize: 16,
-    color: "#1e293b",
-    fontWeight: "500",
+    fontWeight: 'bold',
+    flex: 1,
+    color: '#1e293b',
   },
-  productDate: {
-    fontSize: 14,
-    color: "#64748b",
-    marginTop: 4,
+  itemActions: {
+    flexDirection: 'row',
+    gap: 16,
   },
-  activityItem: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f1f5f9",
+  itemDetails: {
+    gap: 4,
   },
-  activityText: {
-    fontSize: 15,
-    color: "#1e293b",
-  },
-  activityDate: {
-    fontSize: 13,
-    color: "#64748b",
-    marginTop: 2,
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 24,
+    color: '#64748b',
   },
 });
+
+export default InventoryManager;

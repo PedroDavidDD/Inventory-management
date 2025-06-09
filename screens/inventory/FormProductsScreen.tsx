@@ -1,104 +1,171 @@
-import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useAuthStore } from '@/store/authStore';
+import { useProductStore } from '@/store/productStore';
+import { Product } from '@/types';
+import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-export default function FormProductsScreen() {
+const FormProducts = () => {
+  const { editId } = useLocalSearchParams<{ editId?: string }>();
+  const { user } = useAuthStore();
+  const isEditing = !!editId;
+  
+  const { addProduct, updateProduct, getProductById } = useProductStore();
+  
+  const [formData, setFormData] = useState<Omit<Product, 'id' | 'createdAt' | 'status'>>({
+    userId: user?.id || '',
+    name: '',
+    entryDate: new Date().toISOString(),
+    expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    quantity: 1,
+    isEnabled: true,
+    useLowStockAlert: false,
+    useExpirationAlert: false,
+    useRecurrentAlert: false,
+    tags: [],
+  });
+
+  const [showDatePicker, setShowDatePicker] = useState<'entry' | 'expiration' | null>(null);
+
+  useEffect(() => {
+    if (isEditing && editId) {
+      const product = getProductById(editId);
+      if (product) {
+        const { id, createdAt, status, ...rest } = product;
+        setFormData(rest);
+      }
+    }
+  }, [isEditing, editId]);
+
+  const handleSubmit = () => {
+    if (!formData.name) {
+      Alert.alert('Error', 'El nombre del producto es requerido');
+      return;
+    }
+
+    if (!user?.id) {
+      Alert.alert('Error', 'Usuario no autenticado');
+      return;
+    }
+
+    const productData = {
+      ...formData,
+      userId: user.id
+    };
+
+    if (isEditing && editId) {
+      updateProduct(editId, productData);
+    } else {
+      addProduct(productData);
+    }
+    router.back();
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.greeting}>
-          <Text style={styles.dateText}>
-                FormProductsScreen
-          </Text>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <View style={styles.container}>
+      <TextInput
+        style={styles.input}
+        placeholder="Nombre del producto*"
+        value={formData.name}
+        onChangeText={text => setFormData({...formData, name: text})}
+      />
+      
+      <TextInput
+        style={styles.input}
+        placeholder="Cantidad"
+        keyboardType="numeric"
+        value={formData.quantity.toString()}
+        onChangeText={text => setFormData({...formData, quantity: Number(text) || 0})}
+      />
+      
+      <View style={styles.dateRow}>
+        <TouchableOpacity 
+          style={styles.dateButton}
+          onPress={() => setShowDatePicker('entry')}
+        >
+          <Ionicons name="calendar" size={20} color="#4a90e2" />
+          <Text>Ingreso: {new Date(formData.entryDate).toLocaleDateString('es-ES')}</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.dateButton}
+          onPress={() => setShowDatePicker('expiration')}
+        >
+          <Ionicons name="calendar" size={20} color="#e74c3c" />
+          <Text>Vencimiento: {new Date(formData.expirationDate).toLocaleDateString('es-ES')}</Text>
+        </TouchableOpacity>
+      </View>
+      
+      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+        <Text style={styles.submitText}>
+          {isEditing ? 'Actualizar Producto' : 'Agregar Producto'}
+        </Text>
+      </TouchableOpacity>
+      
+      {showDatePicker && (
+        <DateTimePicker
+          value={new Date(showDatePicker === 'entry' ? formData.entryDate : formData.expirationDate)}
+          mode="date"
+          display="default"
+          onChange={(event, date) => {
+            setShowDatePicker(null);
+            if (date) {
+              const field = showDatePicker === 'entry' ? 'entryDate' : 'expirationDate';
+              setFormData({...formData, [field]: date.toISOString()});
+            }
+          }}
+        />
+      )}
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8fafc",
-  },
-  scrollContent: {
     padding: 16,
-    paddingBottom: 32,
+    backgroundColor: '#f8fafc',
   },
-  greeting: {
-    marginBottom: 24,
-  },
-  greetingText: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#1e293b",
-  },
-  dateText: {
-    fontSize: 16,
-    color: "#64748b",
-    marginTop: 4,
-  },
-  statsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    gap: 12,
-    marginBottom: 24,
-  },
-  section: {
-    backgroundColor: "white",
-    borderRadius: 12,
-    padding: 16,
+  input: {
+    height: 50,
+    borderColor: '#cbd5e1',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 16,
     marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
+    backgroundColor: 'white',
   },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
+  dateRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+    gap: 8,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#1e293b",
+  dateButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    borderRadius: 8,
+    backgroundColor: 'white',
   },
-  seeAll: {
-    color: "#6366f1",
-    fontWeight: "500",
+  submitButton: {
+    backgroundColor: '#4a90e2',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 16,
   },
-  productItem: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f1f5f9",
-  },
-  productName: {
+  submitText: {
+    color: 'white',
+    fontWeight: 'bold',
     fontSize: 16,
-    color: "#1e293b",
-    fontWeight: "500",
-  },
-  productDate: {
-    fontSize: 14,
-    color: "#64748b",
-    marginTop: 4,
-  },
-  activityItem: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f1f5f9",
-  },
-  activityText: {
-    fontSize: 15,
-    color: "#1e293b",
-  },
-  activityDate: {
-    fontSize: 13,
-    color: "#64748b",
-    marginTop: 2,
   },
 });
+
+export default FormProducts;

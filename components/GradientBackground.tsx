@@ -11,9 +11,9 @@ interface GradientBackgroundProps {
 export function GradientBackground({ children }: GradientBackgroundProps) {
   const { isDarkMode } = useThemeStore();
   
-  const colors = isDarkMode 
-    ? [COLORS.dark.background.start, COLORS.dark.background.end]
-    : [COLORS.light.background.start, COLORS.light.background.end];
+  const colors: [string, string] = isDarkMode 
+  ? [COLORS.dark.background.start, COLORS.dark.background.end]
+  : [COLORS.light.background.start, COLORS.light.background.end];
 
   return (
     <View style={styles.container}>

@@ -98,7 +98,7 @@ const FormProducts = () => {
     resetForm();
 
     // Navegar y limpiar el parámetro `editId`
-    router.replace('/(drawer)/(tabs)/inventoryManager'); // 👈 Reemplaza con tu ruta correcta
+    router.replace('/(drawer)/(tabs)/inventoryManager');
   };
 
   const handleCancel = () => {

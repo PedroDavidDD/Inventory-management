@@ -1,7 +1,5 @@
 // screens/DashboardScreen.tsx
 import { StatCard } from "@/components/dashboard/StatCard";
-import { useAuthStore } from "@/store/authStore";
-import { router } from "expo-router";
 import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,13 +21,6 @@ export default function DashboardScreen() {
   const totalProducts = useProductStore(getTotalProducts);
   const wastePercentage = useProductStore(getWastePercentage);
 
-  const { logout } = useAuthStore();
-
-  const handleLogout = async () => {
-    await logout();
-    router.replace("/(auth)/login");
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -45,11 +36,6 @@ export default function DashboardScreen() {
             })}
           </Text>
         </View>
-
-        {/* Botón de cerrar sesión */}
-        <Text onPress={handleLogout} style={styles.logoutText}>
-          Cerrar Sesión
-        </Text>
 
         {/* Estadísticas */}
         <View style={styles.statsContainer}>
@@ -110,14 +96,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#64748b",
     marginTop: 4,
-  },
-  logoutText: {
-    fontSize: 16,
-    color: "#6366f1",
-    fontWeight: "500",
-    alignSelf: "flex-end",
-    marginBottom: 24,
-    textDecorationLine: "underline",
   },
   statsContainer: {
     gap: 16,

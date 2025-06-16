@@ -7,6 +7,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
+  ScrollView,
   StyleSheet,
   Switch,
   Text,
@@ -104,18 +105,18 @@ const FormProducts = () => {
     }
 
     resetForm();
-    router.replace('/(drawer)/(tabs)/inventoryManager');
+    router.replace('/(drawer)/(tabs)/formProducts');
   };
 
   const handleCancel = () => {
     resetForm();
-    router.replace('/(drawer)/(tabs)/inventoryManager');
+    router.replace('/(drawer)/(tabs)/formProducts');
   };
 
   const daysOfWeekLabels = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       {/* Nombre del producto */}
       <Text>Nombre del producto</Text>
       <TextInput
@@ -224,7 +225,7 @@ const FormProducts = () => {
           <Text>Días de alerta semanal</Text>
           <View style={styles.daysOfWeekContainer}>
             <View style={styles.daysOfWeekRow}>
-              {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((day, index) => {
+              {daysOfWeekLabels.map((day, index) => {
                 const dayIndex = index as DayOfWeek;
                 return (
                   <TouchableOpacity
@@ -324,7 +325,7 @@ const FormProducts = () => {
           }}
         />
       )}
-    </View>
+    </ScrollView>
   );
 };
 

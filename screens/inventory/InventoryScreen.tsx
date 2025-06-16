@@ -20,7 +20,7 @@ export const InventoryManager = () => {
 
   const filteredProducts = useMemo(() => {
     if (!user) return [];
-    
+    console.log("User ID:", user?.id);
     return products
       .filter(p => p.userId === user.id)
       .filter(product => {

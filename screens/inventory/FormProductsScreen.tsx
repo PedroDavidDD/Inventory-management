@@ -116,7 +116,10 @@ const FormProducts = () => {
   const daysOfWeekLabels = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView 
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+    >
       {/* Nombre del producto */}
       <Text>Nombre del producto</Text>
       <TextInput
@@ -333,7 +336,7 @@ export default FormProducts;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 16,
     backgroundColor: '#f8fafc',
   },

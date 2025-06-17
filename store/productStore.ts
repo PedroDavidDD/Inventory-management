@@ -1,5 +1,6 @@
 // store/productStore.ts
 import { Product, Tag } from "@/types";
+import 'react-native-get-random-values';
 import { v4 as uuidv4 } from "uuid";
 import { create } from "zustand";
 
@@ -23,7 +24,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
   products: [
     {
       id: "p1",
-      userId: "1749969302318",
+      userId: "2",
       name: "Leche",
       entryDate: "2025-04-01T09:00:00Z",
       expirationDate: "2025-04-10T09:00:00Z",
@@ -42,7 +43,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
     },
     {
       id: "p2",
-      userId: "1749969302318",
+      userId: "2",
       name: "Yogurt",
       entryDate: "2025-04-05T09:00:00Z",
       expirationDate: "2025-04-20T09:00:00Z",
@@ -61,7 +62,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
     },
     {
       id: "p3",
-      userId: "1749969302318",
+      userId: "2",
       name: "Manzanas",
       entryDate: "2025-04-10T09:00:00Z",
       expirationDate: "2025-04-30T09:00:00Z",
@@ -80,7 +81,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
     },
     {
       id: "p4",
-      userId: "1749969302318",
+      userId: "2",
       name: "Queso",
       entryDate: "2025-03-20T09:00:00Z",
       expirationDate: "2025-04-01T09:00:00Z",
@@ -99,7 +100,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
     },
     {
       id: "p5",
-      userId: "1749969302318",
+      userId: "2",
       name: "Pan Integral",
       entryDate: "2025-04-15T09:00:00Z",
       expirationDate: "2025-04-22T09:00:00Z",

@@ -1,6 +1,6 @@
 import { useAuthStore } from '@/store/authStore';
 import { useProductStore } from '@/store/productStore';
-import { DayOfWeek, Product } from '@/types';
+import { DayOfWeek, Product, ProductStatus } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -94,6 +94,8 @@ const FormProducts = () => {
     const productData = {
       ...formData,
       userId: user.id,
+      status: calculateProductStatus(formData.expirationDate, formData.notifyDaysBefore),
+      
     };
 
     if (isEditing && editId) {
@@ -114,6 +116,30 @@ const FormProducts = () => {
   };
 
   const daysOfWeekLabels = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
+  const calculateProductStatus = (expirationDate: string, notifyDaysBefore: number | undefined): ProductStatus => {
+    const today = new Date();
+    const expiration = new Date(expirationDate);
+
+    // Asegúrate de que `notifyDaysBefore` tenga valor
+    const daysBeforeThreshold = notifyDaysBefore ?? 5;
+
+    // Limpiar horas para comparación precisa
+    today.setHours(0, 0, 0, 0);
+    expiration.setHours(0, 0, 0, 0);
+
+    if (expiration < today) {
+      return 'vencido';
+    }
+
+    const diffDays = Math.ceil((expiration.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= daysBeforeThreshold) {
+      return 'próximo a vencer';
+    }
+
+    return 'activo';
+  };
 
   return (
     <ScrollView 

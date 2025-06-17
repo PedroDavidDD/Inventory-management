@@ -105,12 +105,12 @@ const FormProducts = () => {
     }
 
     resetForm();
-    router.replace('/(drawer)/(tabs)/formProducts');
+    router.replace('/formProducts');
   };
 
   const handleCancel = () => {
     resetForm();
-    router.replace('/(drawer)/(tabs)/formProducts');
+    router.replace('/formProducts');
   };
 
   const daysOfWeekLabels = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];

@@ -101,7 +101,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       );
 
       if (!user) {
-        throw new Error('Invalid username or password');
+        throw new Error('usuario o contraseña incorrectos');
       }
 
       const authenticatedUser = {
@@ -143,7 +143,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       );
 
       if (existingUser) {
-        throw new Error('Username or email already in use');
+        throw new Error('Nombre de usuario o correo electrónico ya en uso');
       }
 
       const newUser = {

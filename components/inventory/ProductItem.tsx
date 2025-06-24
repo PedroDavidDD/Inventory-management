@@ -1,7 +1,7 @@
 import { Product } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface ProductItemProps {
   product: Product;
@@ -12,6 +12,24 @@ interface ProductItemProps {
 const daysOfWeekLabels = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
 export const ProductItem = ({ product, onEdit, onDelete }: ProductItemProps) => {
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+
+  const handleEdit = () => {
+    onEdit(product.id);
+    setIsMenuVisible(false);
+  };
+
+  const handleDelete = () => {
+    onDelete(product.id);
+    setIsMenuVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsMenuVisible(false);
+  };
+
+  const toggleMenu = () => setIsMenuVisible(!isMenuVisible);
+
   // Helper para formatear fechas
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('es-ES');
@@ -38,6 +56,44 @@ export const ProductItem = ({ product, onEdit, onDelete }: ProductItemProps) => 
         <View style={[styles.statusBadge, { backgroundColor: statusColors[product.status] }]}>
           <Text style={styles.statusText}>{product.status}</Text>
         </View>
+        <TouchableOpacity onPress={toggleMenu}>
+          <Ionicons name="ellipsis-vertical" size={20} color="#6b7280" />
+        </TouchableOpacity>
+        <Modal
+          visible={isMenuVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={handleCancel}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.menuContainer}>
+              {/* Header del producto */}
+              <View style={styles.productHeader}>
+                <Text style={styles.productTitle}>{product.name}</Text>
+                <View style={[styles.statusBadge, { backgroundColor: statusColors[product.status] }]}>
+                  <Text style={styles.statusText}>{product.status}</Text>
+                </View>
+              </View>
+              
+              {/* Separador */}
+              <View style={styles.separator} />
+              
+              {/* Botones de acción */}
+              <TouchableOpacity onPress={handleEdit} style={[styles.menuItem, styles.menuButton]}>
+                <Ionicons name="create-outline" size={20} color="#10b981" />
+                <Text style={styles.menuText}>Editar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleDelete} style={[styles.menuItem, styles.menuButton]}>
+                <Ionicons name="trash-outline" size={20} color="#ef4444" />
+                <Text style={styles.menuText}>Eliminar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleCancel} style={[styles.menuItem, styles.menuButton, styles.cancelButton]}>
+                <Ionicons name="close-outline" size={20} color="#6b7280" />
+                <Text style={styles.menuText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
 
       {/* Información principal */}
@@ -46,16 +102,9 @@ export const ProductItem = ({ product, onEdit, onDelete }: ProductItemProps) => 
           <Ionicons name="cube" size={16} color="#6b7280" /> Cantidad: {product.quantity}
         </Text>
         <Text style={styles.detail}>
-          <Ionicons name="calendar" size={16} color="#6b7280" /> Ingreso: {formatDate(product.entryDate)}
-        </Text>
-        <Text style={styles.detail}>
           <Ionicons name="calendar-number" size={16} color="#6b7280" /> Vencimiento: {formatDate(product.expirationDate)}
         </Text>
-        <Text style={styles.detail}>
-          <Ionicons name="power" size={16} color="#6b7280" /> Estado: {product.isEnabled ? 'Habilitado' : 'Deshabilitado'}
-        </Text>
       </View>
-
       {/* Alertas configuradas */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Alertas</Text>
@@ -89,18 +138,6 @@ export const ProductItem = ({ product, onEdit, onDelete }: ProductItemProps) => 
           </View>
         </View>
       )}
-
-      {/* Acciones */}
-      <View style={styles.actions}>
-        <TouchableOpacity style={styles.actionButton} onPress={() => onEdit(product.id)}>
-          <Ionicons name="pencil" size={20} color="#4a90e2" />
-          <Text style={styles.edit}>Editar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={() => onDelete(product.id)}>
-          <Ionicons name="trash" size={20} color="#ef4444" />
-          <Text style={styles.delete}>Eliminar</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
@@ -138,7 +175,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
-    marginLeft: 8,
+    marginTop: 8,
   },
   statusText: {
     color: 'white',
@@ -209,4 +246,67 @@ const styles = StyleSheet.create({
     color: '#ef4444',
     fontWeight: 'bold',
   },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  menuContainer: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    width: '90%',
+    maxWidth: 300,
+    alignItems: 'center',
+    minHeight: 200,
+    maxHeight: '90%',
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    width: '100%',
+    justifyContent: 'center',
+    borderRadius: 8,
+  },
+  menuButton: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  menuText: {
+    fontSize: 16,
+    color: '#1e293b',
+    fontWeight: '500',
+    marginLeft: 12,
+  },
+  cancelButton: {
+    marginTop: 16,
+    backgroundColor: '#f3f4f6',
+    borderRadius: 8,
+    paddingVertical: 12,
+  },
+  productHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    flexWrap: 'wrap',
+    marginBottom: 16,
+  },
+  productTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1e293b',
+    flex: 1,
+  },
+  separator: {
+    width: '100%',
+    height: 1,
+    backgroundColor: '#e5e7eb',
+    marginVertical: 16,
+  },
+
 });

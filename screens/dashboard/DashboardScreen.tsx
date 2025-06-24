@@ -1,10 +1,8 @@
-// screens/DashboardScreen.tsx
 import { StatCard } from "@/components/dashboard/StatCard";
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// Zustand + Selectores
 import {
   getExpiredProducts,
   getExpiringProducts,
@@ -24,19 +22,6 @@ export default function DashboardScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Saludo */}
-        <View style={styles.greeting}>
-          <Text style={styles.greetingText}>Hola, Admin</Text>
-          <Text style={styles.dateText}>
-            {new Date().toLocaleDateString("es-ES", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </Text>
-        </View>
-
         {/* Estadísticas */}
         <View style={styles.statsContainer}>
           <StatCard
@@ -83,19 +68,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     paddingBottom: 32,
-  },
-  greeting: {
-    marginBottom: 24,
-  },
-  greetingText: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#1e293b",
-  },
-  dateText: {
-    fontSize: 16,
-    color: "#64748b",
-    marginTop: 4,
   },
   statsContainer: {
     gap: 16,

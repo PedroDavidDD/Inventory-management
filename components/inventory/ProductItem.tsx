@@ -9,7 +9,6 @@ interface ProductItemProps {
   onDelete: (id: string) => void;
 }
 
-// Mapeo de días de la semana para mostrar nombres
 const daysOfWeekLabels = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
 export const ProductItem = ({ product, onEdit, onDelete }: ProductItemProps) => {

@@ -147,16 +147,22 @@ const FormProducts = () => {
       keyboardShouldPersistTaps="handled"
     >
       {/* Nombre del producto */}
-      <Text>Nombre del producto</Text>
+      <Text 
+        style={[styles.textHead, styles.textRequired]} 
+      >
+        Nombre del producto*
+      </Text>
       <TextInput
         style={styles.input}
-        placeholder="Nombre del producto*"
+        placeholder="Ej: Arroz Integral"
         value={formData.name}
         onChangeText={(text) => setFormData({ ...formData, name: text })}
       />
 
       {/* Cantidad */}
-      <Text>Cantidad</Text>
+      <Text 
+        style={[styles.textHead]} 
+      >Cantidad</Text>
       <TextInput
         style={styles.input}
         placeholder="Cantidad"
@@ -166,14 +172,61 @@ const FormProducts = () => {
           setFormData({ ...formData, quantity: Number(text) || 0 })
         }
       />
+      
+      {/* Etiquetas */}
+      <Text>Etiquetas</Text>
+      <View style={styles.tagsContainer}>
+        <View style={styles.tagsRow}>
+          <TextInput
+            style={styles.tagInput}
+            placeholder="Ej: Frutas, Verduras, Lácteos"
+            value={formData.tags.join(', ')}
+            onChangeText={(text) => {
+              const newTags = text.split(',').map(tag => tag.trim());
+              setFormData({ ...formData, tags: newTags });
+            }}
+          />
+          <TouchableOpacity style={styles.addTagButton} onPress={() => console.log('Agregar etiqueta')}>
+            <Text>Agregar</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Botones de fecha */}
+      <Text 
+        style={[styles.textHead, styles.textRequired]} 
+      >
+        Fecha de ingreso y vencimiento*
+      </Text>
+      <View style={styles.dateRow}>
+        <TouchableOpacity
+          style={styles.dateButton}
+          onPress={() => setShowDatePicker('entry')}
+        >
+          <Ionicons name="calendar" size={20} color="#4a90e2" />
+          <Text>Ingreso: {new Date(formData.entryDate).toLocaleDateString('es-ES')}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.dateButton}
+          onPress={() => setShowDatePicker('expiration')}
+        >
+          <Ionicons name="calendar" size={20} color="#e74c3c" />
+          <Text>Vencimiento: {new Date(formData.expirationDate).toLocaleDateString('es-ES')}</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Estado de acción */}
       <View style={styles.toggleContainer}>
-        <Text>Estado de acción</Text>
+        <Text style={styles.headRow}>Estado de acción*</Text>
         <View style={styles.toggleRow}>
-          <Text>Habilitado / Deshabilitado</Text>
+          { (formData.isEnabled) 
+            ? (<Text style={[formData.isEnabled && styles.activeSwitch]}>Habilitado</Text>)
+            : (<Text style={[!formData.isEnabled && styles.desabledSwitch]}>Deshabilitado</Text>)
+          }
           <Switch
             value={formData.isEnabled}
+            trackColor={{ false: '#e74c3c', true: '#4ade80' }}
             onValueChange={(newValue) => setFormData({ ...formData, isEnabled: newValue })}
           />
         </View>
@@ -181,7 +234,7 @@ const FormProducts = () => {
 
       {/* Configuración de alertas */}
       <View style={styles.alertsContainer}>
-        <Text>Tipo de alertas</Text>
+        <Text style={styles.headRow}>Tipo de alertas</Text>
         <View style={styles.alertRow}>
           <Text>Alerta de vencimiento</Text>
           <Switch
@@ -205,9 +258,18 @@ const FormProducts = () => {
         </View>
       </View>
 
+      {/* Hora de alerta */}
+      <Text>Hora de alerta</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Hora de alerta"
+        value={formData.alertTime}
+        onChangeText={(text) => setFormData({ ...formData, alertTime: text })}
+      />
+      
       {/* Días antes de notificar */}
       {formData.useExpirationAlert && (
-        <View style={styles.inputRow}>
+        <>
           <Text>Días antes de notificar</Text>
           <TextInput
             style={styles.input}
@@ -218,12 +280,12 @@ const FormProducts = () => {
               setFormData({ ...formData, notifyDaysBefore: Number(text) || 0 })
             }
           />
-        </View>
+        </>
       )}
 
       {/* Cantidad mínima */}
       {formData.useLowStockAlert && (
-        <View style={styles.inputRow}>
+        <>
           <Text>Cantidad mínima</Text>
           <TextInput
             style={styles.input}
@@ -234,20 +296,9 @@ const FormProducts = () => {
               setFormData({ ...formData, lowStockThreshold: Number(text) || 0 })
             }
           />
-        </View>
+        </>
       )}
-
-      {/* Hora de alerta */}
-      <Text>Hora de alerta</Text>
-      <View style={styles.inputRow}>
-        <TextInput
-          style={styles.input}
-          placeholder="Hora de alerta"
-          value={formData.alertTime}
-          onChangeText={(text) => setFormData({ ...formData, alertTime: text })}
-        />
-      </View>
-
+      
       {/* Días de alerta semanal */}
       {formData.useRecurrentAlert && (
         <>
@@ -286,44 +337,6 @@ const FormProducts = () => {
           </View>
         </>
       )}
-
-      {/* Etiquetas */}
-      <Text>Etiquetas</Text>
-      <View style={styles.tagsContainer}>
-        <View style={styles.tagsRow}>
-          <TextInput
-            style={styles.tagInput}
-            placeholder="Ej: Frutas, Verduras, Lácteos"
-            value={formData.tags.join(', ')}
-            onChangeText={(text) => {
-              const newTags = text.split(',').map(tag => tag.trim());
-              setFormData({ ...formData, tags: newTags });
-            }}
-          />
-          <TouchableOpacity style={styles.addTagButton} onPress={() => console.log('Agregar etiqueta')}>
-            <Text>Agregar</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Botones de fecha */}
-      <View style={styles.dateRow}>
-        <TouchableOpacity
-          style={styles.dateButton}
-          onPress={() => setShowDatePicker('entry')}
-        >
-          <Ionicons name="calendar" size={20} color="#4a90e2" />
-          <Text>Ingreso: {new Date(formData.entryDate).toLocaleDateString('es-ES')}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.dateButton}
-          onPress={() => setShowDatePicker('expiration')}
-        >
-          <Ionicons name="calendar" size={20} color="#e74c3c" />
-          <Text>Vencimiento: {new Date(formData.expirationDate).toLocaleDateString('es-ES')}</Text>
-        </TouchableOpacity>
-      </View>
 
       {/* Botones de acción */}
       <View style={styles.buttonContainer}>
@@ -375,8 +388,24 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     backgroundColor: 'white',
   },
+  textHead: {
+    marginBottom: 8,
+  },
+  textRequired: {
+    color: '#ef4444',
+  },
+  activeSwitch: {
+    color: '#4ade80',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  desabledSwitch: {
+    color: '#e74c3c',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
   toggleContainer: {
-    marginBottom: 16,
+    marginBottom: 8,
   },
   toggleRow: {
     flexDirection: 'row',
@@ -399,6 +428,7 @@ const styles = StyleSheet.create({
   },
   daysOfWeekContainer: {
     marginBottom: 16,
+    marginTop: 8,
   },
   daysOfWeekRow: {
     flexDirection: 'row',
@@ -419,6 +449,7 @@ const styles = StyleSheet.create({
   },
   tagsContainer: {
     marginBottom: 16,
+    marginTop: 8,
   },
   tagsRow: {
     flexDirection: 'row',
@@ -472,8 +503,6 @@ const styles = StyleSheet.create({
   },
   submitText: {
     color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
   },
   cancelButton: {
     flex: 1,
@@ -486,5 +515,9 @@ const styles = StyleSheet.create({
     color: '#1f2937',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  headRow: {
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });

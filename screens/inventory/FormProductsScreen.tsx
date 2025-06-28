@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import SelectDropdown from 'react-native-select-dropdown';
 
 const FormProducts = () => {
   const { editId } = useLocalSearchParams<{ editId?: string }>();
@@ -22,6 +23,13 @@ const FormProducts = () => {
   const isEditing = !!editId;
 
   const { addProduct, updateProduct, getProductById } = useProductStore();
+
+  // Etiquetas disponibles
+  const availableTags = [
+    'Frutas', 'Verduras', 'Lácteos', 'Carnes', 'Abarrotes', 'Congelados',
+    'Panadería', 'Bebidas', 'Snacks', 'Enlatados', 'Papelería', 'Higiene',
+    'Limpieza', 'Otros'
+  ];
 
   // Estado inicial del formulario
   const [formData, setFormData] = useState<Omit<Product, 'id' | 'createdAt' | 'status'>>({
@@ -176,19 +184,48 @@ const FormProducts = () => {
       {/* Etiquetas */}
       <Text>Etiquetas</Text>
       <View style={styles.tagsContainer}>
-        <View style={styles.tagsRow}>
-          <TextInput
-            style={styles.tagInput}
-            placeholder="Ej: Frutas, Verduras, Lácteos"
-            value={formData.tags.join(', ')}
-            onChangeText={(text) => {
-              const newTags = text.split(',').map(tag => tag.trim());
-              setFormData({ ...formData, tags: newTags });
-            }}
-          />
-          <TouchableOpacity style={styles.addTagButton} onPress={() => console.log('Agregar etiqueta')}>
-            <Text>Agregar</Text>
-          </TouchableOpacity>
+        <SelectDropdown
+          data={availableTags}
+          onSelect={(selectedItem: string, index: number) => {
+            const currentTags = formData.tags || [];
+            if (!currentTags.includes(selectedItem)) {
+              setFormData({ ...formData, tags: [...currentTags, selectedItem] });
+            }
+          }}
+          renderButton={() => (
+            <View style={styles.selectDropdown}>
+              <Text style={styles.selectDropdownText}>
+                {formData.tags.length > 0 ? formData.tags.join(', ') : 'Seleccionar etiqueta'}
+              </Text>
+              <Ionicons name="chevron-down" size={20} color="#4a90e2" />
+            </View>
+          )}
+          renderItem={(item: string, index: number) => (
+            <View style={[styles.selectDropdownRow, { flexDirection: 'row', alignItems: 'center' }]}>
+              <Text style={styles.selectDropdownRowText}>{item}</Text>
+            </View>
+          )}
+          dropdownStyle={{
+            borderWidth: 1,
+            borderColor: '#cbd5e1',
+            borderRadius: 8,
+            backgroundColor: 'white'
+          }}
+        />
+        
+        {/* Lista de etiquetas seleccionadas */}
+        <View style={styles.selectedTagsContainer}>
+          {formData.tags.map((tag, index) => (
+            <View key={index} style={styles.selectedTag}>
+              <Text style={styles.selectedTagText}>{tag}</Text>
+              <TouchableOpacity 
+                style={styles.removeTagButton}
+                onPress={() => setFormData({ ...formData, tags: formData.tags.filter(t => t !== tag) })}
+              >
+                <Ionicons name="close-circle" size={20} color="#ef4444" />
+              </TouchableOpacity>
+            </View>
+          ))}
         </View>
       </View>
 
@@ -519,5 +556,49 @@ const styles = StyleSheet.create({
   headRow: {
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  selectDropdown: {
+    height: 50,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  selectDropdownText: {
+    color: '#1f2937',
+    fontSize: 16,
+  },
+  selectDropdownRow: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#cbd5e1',
+  },
+  selectDropdownRowText: {
+    color: '#1f2937',
+    fontSize: 16,
+  },
+  selectedTagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 8,
+  },
+  selectedTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f1f5f9',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    gap: 8,
+  },
+  selectedTagText: {
+    color: '#1f2937',
+    fontSize: 14,
+  },
+  removeTagButton: {
+    padding: 4,
   },
 });

@@ -4,7 +4,7 @@ import { useProductStore } from '@/store/productStore';
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect } from 'expo-router';
 import React, { useState } from 'react';
-import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function TagsPage() {
   const { isAuthenticated } = useAuthStore();
@@ -31,10 +31,30 @@ export default function TagsPage() {
   };
 
   const handleAddTagSubmit = () => {
-    if (newTagName.trim()) {
-      addTag(newTagName.trim());
-      setNewTagName('');
+    if (!newTagName.trim()) {
+      Alert.alert(
+        'Error',
+        'El nombre de la etiqueta no puede estar vacío',
+        [{ text: 'OK', style: 'cancel' }]
+      );
+      return;
     }
+
+    // Convertir a minúsculas para comparación sin distinción de mayúsculas
+    const normalizedNewTag = newTagName.trim().toLowerCase();
+    const normalizedTags = tags.map(tag => tag.name.toLowerCase());
+
+    if (normalizedTags.includes(normalizedNewTag)) {
+      Alert.alert(
+        'Error',
+        'Esta etiqueta ya existe',
+        [{ text: 'OK', style: 'cancel' }]
+      );
+      return;
+    }
+
+    addTag(normalizedNewTag);
+    setNewTagName('');
     setShowAddModal(false);
   };
 

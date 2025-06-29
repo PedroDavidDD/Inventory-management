@@ -1,3 +1,4 @@
+import { TabTitle } from "@/components/TabTitle";
 import { COLORS } from "@/constants/theme";
 import { useAuthStore } from "@/store/authStore";
 import { useProductStore } from "@/store/productStore";
@@ -176,7 +177,8 @@ const FormProducts = () => {
     <ScrollView
       contentContainerStyle={styles.container}
       keyboardShouldPersistTaps="handled"
-    >
+    >     
+      <TabTitle title="Formulario de Productos" /> 
       {/* Nombre del producto */}
       <Text style={[styles.textHead, styles.textRequired]}>
         Nombre del producto*

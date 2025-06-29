@@ -1,3 +1,4 @@
+import { TabTitle } from '@/components/TabTitle';
 import { COLORS } from '@/constants/theme';
 import { useAuthStore } from '@/store/authStore';
 import { useProductStore } from '@/store/productStore';
@@ -73,9 +74,9 @@ export default function TagsPage() {
 
   return (
     <View style={styles.container}>
+      <TabTitle title="Etiquetas" />
       <ScrollView style={{ flex: 1 }}>
         <View style={styles.content}>
-          <Text style={styles.title}>Etiquetas</Text>
           <View style={styles.tagsContainer}>
             {tags.map((tag, index) => (
               <View key={tag.id} style={[styles.tag, { backgroundColor: pastelColors[index % 5] }]}>
@@ -173,7 +174,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8fafc',
-    position: 'relative',
   },
   content: {
     padding: 20,
@@ -249,6 +249,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1f2937',
     marginBottom: 20,
+  },
+  tabTitleContainer: {
+    paddingVertical: 16,
+    paddingHorizontal: 20,
   },
   tagsContainer: {
     flexDirection: 'row',

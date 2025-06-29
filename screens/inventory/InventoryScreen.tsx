@@ -1,5 +1,6 @@
 import { FilterButton } from '@/components/inventory/FilterButton';
 import { ProductItem } from '@/components/inventory/ProductItem';
+import { TabTitle } from '@/components/TabTitle';
 import { COLORS } from '@/constants/theme';
 import { useAuthStore } from '@/store/authStore';
 import { useProductStore } from '@/store/productStore';
@@ -37,6 +38,7 @@ export const InventoryManager = () => {
 
   return (
     <View style={styles.container}>
+      <TabTitle title="Inventario" />
       <TouchableOpacity
         style={styles.fab}
         onPress={() => router.push('/(tabs)/formProducts')}

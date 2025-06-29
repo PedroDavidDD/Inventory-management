@@ -3,6 +3,7 @@ import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { TabTitle } from "@/components/TabTitle";
 import {
   getExpiredProducts,
   getExpiringProducts,
@@ -21,41 +22,42 @@ export default function DashboardScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TabTitle title="Dashboard" />
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Estadísticas */}
-        <View style={styles.statsContainer}>
-          <StatCard
-            title="Total Productos"
-            value={totalProducts.toString()}
-            icon="inventory"
-            color="#8b5cf6"
-          />
-          <StatCard
-            title="Bajo Stock"
-            value={lowStockProducts.length.toString()}
-            icon="warning"
-            color="#f59e0b"
-          />
-          <StatCard
-            title="Próximos a Vencer"
-            value={expiringProducts.length.toString()}
-            icon="schedule"
-            color="#10b981"
-          />
-          <StatCard
-            title="Vencidos"
-            value={expiredProducts.length.toString()}
-            icon="delete"
-            color="#ef4444"
-          />
-          <StatCard
-            title="% Merma"
-            value={`${wastePercentage}%`}
-            icon="trending-down"
-            color="#6366f1"
-          />
-        </View>
-      </ScrollView>
+          {/* Estadísticas */}
+          <View style={styles.statsContainer}>
+            <StatCard
+              title="Total Productos"
+              value={totalProducts.toString()}
+              icon="inventory"
+              color="#8b5cf6"
+            />
+            <StatCard
+              title="Bajo Stock"
+              value={lowStockProducts.length.toString()}
+              icon="warning"
+              color="#f59e0b"
+            />
+            <StatCard
+              title="Próximos a Vencer"
+              value={expiringProducts.length.toString()}
+              icon="schedule"
+              color="#10b981"
+            />
+            <StatCard
+              title="Vencidos"
+              value={expiredProducts.length.toString()}
+              icon="delete"
+              color="#ef4444"
+            />
+            <StatCard
+              title="% Merma"
+              value={`${wastePercentage}%`}
+              icon="trending-down"
+              color="#6366f1"
+            />
+          </View>
+        </ScrollView>
     </SafeAreaView>
   );
 }

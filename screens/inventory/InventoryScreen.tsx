@@ -4,9 +4,10 @@ import { COLORS } from '@/constants/theme';
 import { useAuthStore } from '@/store/authStore';
 import { useProductStore } from '@/store/productStore';
 import { ProductStatus } from '@/types';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const statusFilters: (ProductStatus | 'all')[] = ['all', 'activo', 'próximo a vencer', 'vencido'];
 
@@ -36,6 +37,12 @@ export const InventoryManager = () => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => router.push('/(tabs)/formProducts')}
+      >
+        <Ionicons name="add" size={24} color="white" />
+      </TouchableOpacity>
       <TextInput
         style={styles.searchInput}
         placeholder="Buscar productos..."
@@ -104,8 +111,21 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     textAlign: 'center',
-    marginTop: 24,
+    marginTop: 16,
     color: '#64748b',
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: COLORS.light.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
+    zIndex: 9,
   },
 });
 

@@ -26,7 +26,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="inventoryManager"
         options={{
-          title: "Gestor de inventario",
+          title: "Inventario",
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="category" size={24} color={color} />
           ),
@@ -36,7 +36,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="formProducts"
         options={{
-          title: "Agregar productos",
+          title: "Productos",
           tabBarIcon: ({ color }) => (
             <MaterialIcons name="add-box" size={24} color={color} />
           ),

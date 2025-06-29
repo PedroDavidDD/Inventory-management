@@ -31,7 +31,7 @@ export const InventoryManager = () => {
   }, [products, user, searchQuery, selectedStatus]);
 
   const handleEdit = (id: string) => {
-    router.push(`/(drawer)/(tabs)/formProducts?editId=${id}`);
+    router.push(`/(tabs)/formProducts?editId=${id}`);
   };
 
   return (

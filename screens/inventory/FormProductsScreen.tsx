@@ -1,3 +1,4 @@
+import { COLORS } from "@/constants/theme";
 import { useAuthStore } from "@/store/authStore";
 import { useProductStore } from "@/store/productStore";
 import { DayOfWeek, Product, ProductStatus } from "@/types";
@@ -590,7 +591,7 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     flex: 1,
-    backgroundColor: "#4a90e2",
+    backgroundColor: COLORS.light.primary,
     padding: 16,
     borderRadius: 8,
     alignItems: "center",

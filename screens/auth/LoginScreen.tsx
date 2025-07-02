@@ -1,13 +1,14 @@
 import { Button } from "@/components/Button";
+import { Form } from "@/components/Form";
 import { GradientBackground } from "@/components/GradientBackground";
 import { TextInput } from "@/components/TextInput";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { COLORS, FONT_SIZE, SPACING } from "@/constants/theme";
-import { useAuthStore } from "@/store/authStore";
+import { useAuth } from "@/contexts/AuthContext";
 import { useThemeStore } from "@/store/themeStore";
 import { validateLoginForm } from "@/utils/validations";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -20,7 +21,7 @@ import {
 
 export default function LoginScreen() {
   const { isDarkMode } = useThemeStore();
-  const { login, isLoading, error, checkAuth } = useAuthStore();
+  const { login, isLoading, error } = useAuth();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -29,10 +30,6 @@ export default function LoginScreen() {
   >({});
 
   const theme = isDarkMode ? COLORS.dark : COLORS.light;
-
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
 
   const handleLogin = async () => {
     // Validate form
@@ -46,6 +43,7 @@ export default function LoginScreen() {
 
     try {
       await login(username, password);
+      console.log("Funciona");
     } catch (err) {
       // Error is handled by the store, but we can add additional handling here if needed
       console.error("Login error:", err);
@@ -86,37 +84,41 @@ export default function LoginScreen() {
               </View>
             )}
 
-            <TextInput
-              label="Usuario"
-              placeholder="Ingrese su usuario"
-              value={username}
-              onChangeText={setUsername}
-              autoCapitalize="none"
-              error={validationErrors.username}
-            />
+            <Form onSubmit={handleLogin}>
+              <TextInput
+                label="Usuario"
+                placeholder="Ingrese su usuario"
+                value={username}
+                onChangeText={setUsername}
+                autoCapitalize="none"
+                error={validationErrors.username}
+                autoComplete="username"
+              />
 
-            <TextInput
-              label="Contraseña"
-              placeholder="Ingrese su contraseña"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              showPasswordToggle
-              error={validationErrors.password}
-            />
+              <TextInput
+                label="Contraseña"
+                placeholder="Ingrese su contraseña"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                showPasswordToggle
+                error={validationErrors.password}
+                autoComplete="current-password"
+              />
 
-            <Button
-              title="Iniciar Sesión"
-              onPress={handleLogin}
-              loading={isLoading}
-              style={styles.loginButton}
-            />
+              <Button
+                title="Iniciar Sesión"
+                onPress={handleLogin}
+                loading={isLoading}
+                style={styles.loginButton}
+              />
+            </Form>
 
             <View style={styles.registerLinkContainer}>
               <Text style={{ color: theme.text.secondary }}>
                 ¿No tienes una cuenta?{" "}
               </Text>
-              {/* <Link href="/(auth)/register" asChild> */}
+              {/* <Link href="/auth/register" asChild> */}
               <TouchableOpacity onPress={() => router.navigate("/(auth)/register")}>
                 <Text style={{ color: theme.primary, fontWeight: "500" }}>
                   Regístrate

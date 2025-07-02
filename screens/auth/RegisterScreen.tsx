@@ -3,7 +3,7 @@ import { GradientBackground } from "@/components/GradientBackground";
 import { TextInput } from "@/components/TextInput";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { COLORS, FONT_SIZE, SPACING } from "@/constants/theme";
-import { useAuthStore } from "@/store/authStore";
+import { useAuth } from "@/contexts/AuthContext";
 import { useThemeStore } from "@/store/themeStore";
 import { validateRegisterForm } from "@/utils/validations";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -21,7 +21,7 @@ import {
 
 export default function RegisterScreen() {
   const { isDarkMode } = useThemeStore();
-  const { register, isLoading, error } = useAuthStore();
+  const { register, isLoading, error } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

@@ -9,7 +9,7 @@ export const getProducts = (state: ProductState) => state.products;
 /**
  * Selecciona los tags actuales
  */
-export const getTags = (state: ProductState) => state.tags;
+export const getTags = (state: ProductState, userId: string) => state.tags.filter(t => t.userId === userId);
 
 /**
  * Filtra productos en bajo stock

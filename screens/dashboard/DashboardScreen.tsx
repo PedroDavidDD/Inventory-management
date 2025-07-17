@@ -2,6 +2,7 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Product } from "@/types";
 
 import { TabTitle } from "@/components/TabTitle";
 import {
@@ -12,13 +13,35 @@ import {
   getWastePercentage,
 } from "@/store/productSelectors";
 import { useProductStore } from "@/store/productStore";
+import { useAuthStore } from "@/store/authStore";
+
+// Tipos para los selectores
+const getProducts = (state: { products: Product[] }) => state.products;
 
 export default function DashboardScreen() {
-  const lowStockProducts = useProductStore(getLowStockProducts);
-  const expiringProducts = useProductStore(getExpiringProducts);
-  const expiredProducts = useProductStore(getExpiredProducts);
-  const totalProducts = useProductStore(getTotalProducts);
-  const wastePercentage = useProductStore(getWastePercentage);
+  const { user } = useAuthStore();
+  const allProducts = useProductStore(getProducts);
+  
+  // Verificar si hay un usuario autenticado
+  if (!user) {
+    return null;
+  }
+  
+  // Filtrar productos por usuario
+  const userProducts = allProducts.filter((product: Product) => product.userId === user.id);
+  
+  // Calcular métricas
+  const lowStockProducts = userProducts.filter((p: Product) =>
+    p.useLowStockAlert && p.lowStockThreshold !== undefined && p.quantity < p.lowStockThreshold
+  );
+  
+  const expiringProducts = userProducts.filter((p: Product) => p.status === "próximo a vencer");
+  const expiredProducts = userProducts.filter((p: Product) => p.status === "vencido");
+  const totalProducts = userProducts.length;
+  
+  // Calcular porcentaje de merma
+  const wastePercentage = totalProducts > 0 ? 
+    ((expiredProducts.length / totalProducts) * 100).toFixed(1) : "0.0";
 
   return (
     <SafeAreaView style={styles.container}>

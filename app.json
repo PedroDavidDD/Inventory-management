@@ -35,7 +35,16 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-localization",
+      [
+        "expo-notifications",
+        {
+          "icon": "./path/to/your/notification-icon.png",
+          "color": "#ffffff",
+          "sounds": ["./path/to/your/notification-sound.wav"]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
